@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\SiteController;
+use App\Http\Controllers\ResourceController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 // Routes
-
-Route::resource('/', SiteController::class)->middleware(Auth::routes());
-Route::resource('/sites', SiteController::class);
+Route::middleware('auth')->group(function () {
+    Route::resource('/', ResourceController::class);
+    Route::resource('/resources', ResourceController::class);
+});

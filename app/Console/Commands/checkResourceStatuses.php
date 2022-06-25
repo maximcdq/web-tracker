@@ -2,41 +2,32 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\StatusNotification;
+use App\Repositories\ResourceRepository;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 
 class checkResourceStatuses extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'checkResourceStatuses';
+    protected $description = 'The command sends a message about changing the status of a resource';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
+    private $resourceRepository;
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         parent::__construct();
+        $this->resourceRepository = new ResourceRepository();
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
     public function handle()
     {
-        dd(12);
+        $modifyResources = $this->resourceRepository->getModifyResources();
+
+        if (!empty($modifyResources)) {
+            foreach ($modifyResources as $modifyResource) {
+                Mail::to($modifyResource['email'])->send(new StatusNotification($modifyResource));
+            }
+        }
     }
 }
